@@ -1,6 +1,6 @@
 # Data-Warehouse
 ROLAP Datawarehouse implementata per offire supporto al funzionamento del Sistema Sanitario Nazionale.
-La relazione è comprensiva dei seguenti schemi:
+La relazione comprende i seguenti schemi:
 - BPMN per la descrizione dei processi
 - UML rappresentazione database transazionale 
 - E-R rappresentazione database transazionale
