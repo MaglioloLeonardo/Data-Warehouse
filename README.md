@@ -1,4 +1,4 @@
-# Data-Warehouse
+# DataWarehouse project
 ROLAP Datawarehouse implementata per offire supporto al funzionamento del Sistema Sanitario Nazionale.
 
 La relazione comprende i seguenti schemi:
