@@ -12,4 +12,4 @@ La relazione comprende i seguenti schemi:
 - Query DDL Star Schema PostgreSQL
 - Alcune Query DML Star Schema PostgreSQL
 
-Nel caso vi fossero problemi quel che riguarda la visione delle immagini all'interno della relazione, è possibile consultare gli schemi a risoluzione massima inseriti nell'apposita apposita directory 'Schemi'.
+Nel caso vi fossero problemi per quel che riguarda la visione delle immagini all'interno della relazione, è possibile consultare gli schemi a risoluzione massima inseriti nell'apposita apposita directory 'Schemi'.
