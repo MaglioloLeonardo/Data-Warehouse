@@ -1,0 +1,108 @@
+https://www.postgresqltutorial.com/postgresql-date-functions/
+https://stackoverflow.com/questions/952493/how-do-i-convert-an-interval-into-a-number-of-hours-with-postgres
+
+
+Query a)x
+
+select EXTRACT(MONTH FROM a.data_vendita)::int AS month, EXTRACT(YEAR FROM a.data_vendita)::int AS year, SUM(a.Costo_SSN) AS costo_SSN
+from Acquisto a 
+where (EXTRACT(epoch FROM AGE(CURRENT_DATE, a.data_vendita))/86400)::int BETWEEN 0 AND 365*5
+group by year, month
+order by year, month;
+
+Query b)x
+WITH acquisto_paziente as (select * from Acquisto a join pazientedt p on (a.ID_paziente = p.id_paziente))
+
+select t.month, t.year, sum(t."costo_giovani_SSN") as "costo_giovani_SSN", sum(t."costo_adulti_SSN") as "costo_adulti_SSN", sum(t."costo_anziani_SSN") as "costo_anziani_SSN", sum(t."costo_molto_anziani_SSN") as "costo_molto_anziani_SSN"
+from (
+select EXTRACT(MONTH FROM ap.data_vendita)::int AS month, EXTRACT(YEAR FROM ap.data_vendita)::int AS year,  ap.costo_SSN as "costo_giovani_SSN", 0 as "costo_adulti_SSN", 0 as "costo_anziani_SSN", 0 as "costo_molto_anziani_SSN"
+from acquisto_paziente ap
+where ((EXTRACT(epoch FROM AGE(CURRENT_DATE, ap.data_vendita))/86400)::int BETWEEN 0 AND 365*5) and (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita BETWEEN 0 AND 19)
+
+union all
+
+select EXTRACT(MONTH FROM ap.data_vendita)::int AS month, EXTRACT(YEAR FROM ap.data_vendita)::int AS year,  0 as "costo_giovani_SSN", ap.costo_SSN as "costo_adulti_SSN", 0 as "costo_anziani_SSN", 0 as "costo_molto_anziani_SSN"
+from acquisto_paziente ap
+where ((EXTRACT(epoch FROM AGE(CURRENT_DATE, ap.data_vendita))/86400)::int BETWEEN 0 AND 365*5) and (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita BETWEEN 20 AND 64)
+
+union all 
+
+select EXTRACT(MONTH FROM ap.data_vendita)::int AS month, EXTRACT(YEAR FROM ap.data_vendita)::int AS year,  0 as "costo_giovani_SSN", 0 as "costo_adulti_SSN", ap.costo_SSN as "costo_anziani_SSN", 0 as "costo_molto_anziani_SSN"
+from acquisto_paziente ap
+where ((EXTRACT(epoch FROM AGE(CURRENT_DATE, ap.data_vendita))/86400)::int BETWEEN 0 AND 365*5) and (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita BETWEEN 65 AND 79)
+
+union all
+
+select EXTRACT(MONTH FROM ap.data_vendita)::int AS month, EXTRACT(YEAR FROM ap.data_vendita)::int AS year,  0 as "costo_giovani_SSN", 0 as "costo_adulti_SSN", 0 as "costo_anziani_SSN", ap.costo_SSN as "costo_molto_anziani_SSN"
+from acquisto_paziente ap
+where ((EXTRACT(epoch FROM AGE(CURRENT_DATE, ap.data_vendita))/86400)::int BETWEEN 0 AND 365*5) and (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita >= 80)
+
+
+) as t
+group by t.year, t.month
+order by t.year, t.month;
+
+Query c) x
+
+WITH acquisto_paziente as (select * from Acquisto a join pazientedt p on (a.ID_paziente = p.id_paziente)),
+
+ratio_table as (
+	select 'pazienti_giovani' as "tipo_pazienti" , t2.conteggio::float/t1.conteggio::float as ratio
+from (select count(*) as "conteggio"
+	from acquisto_paziente ap
+	where  (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita BETWEEN 0 AND 19) and ap.esenzione = FALSE) as t1,
+	(select count(*) as "conteggio"
+	from acquisto_paziente ap
+	where  (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita BETWEEN 0 AND 19) and ap.esenzione = FALSE and ap.Costo_paziente > 0) as t2
+where t1.conteggio > 0
+
+union all
+
+select 'pazienti_adulti' as "tipo_pazienti" , t2.conteggio::float/t1.conteggio::float as ratio
+from (select count(*) as "conteggio"
+	from acquisto_paziente ap
+	where  (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita BETWEEN 20 AND 64) and ap.esenzione = FALSE) as t1,
+	(select count(*) as "conteggio"
+	from acquisto_paziente ap
+	where  (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita BETWEEN 20 AND 64) and ap.esenzione = FALSE and ap.Costo_paziente > 0) as t2
+where t1.conteggio > 0
+
+union all
+
+select 'pazienti_anziani' as "tipo_pazienti" , t2.conteggio::float/t1.conteggio::float as ratio
+from (select count(*) as "conteggio"
+	from acquisto_paziente ap
+	where  (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita BETWEEN 65 AND 79) and ap.esenzione = FALSE) as t1,
+	(select count(*) as "conteggio"
+	from acquisto_paziente ap
+	where  (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita BETWEEN 65 AND 79) and ap.esenzione = FALSE and ap.Costo_paziente > 0) as t2
+where t1.conteggio > 0
+
+union all
+
+select 'pazienti_molto_anziani' as "tipo_pazienti" ,t2.conteggio::float/t1.conteggio::float as ratio
+from (select count(*) as "conteggio"
+	from acquisto_paziente ap
+	where  (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita >= 80) and ap.esenzione = FALSE) as t1,
+	(select count(*) as "conteggio"
+	from acquisto_paziente ap
+	where  (EXTRACT(year from CURRENT_DATE)::int - ap.Anno_nascita >= 80) and ap.esenzione = FALSE and ap.Costo_paziente > 0) as t2
+where t1.conteggio > 0
+)
+
+
+select ratio_table.tipo_pazienti
+from ratio_table
+where ratio_table.ratio = (select MAX(t.ratio)
+						  	from ratio_table as t);
+
+
+
+
+Query d)x
+
+select f.Nome_farmaco, f.Produttore_farmaco, f.Prezzo_recente
+from FarmacoDT f
+where f.Nome_famiglia = 'antibiotici' and f.generico = FALSE and EXISTS(select * 
+																		from Acquisto a
+																		where a.ID_farmaco = f.ID_farmaco and EXTRACT(YEAR FROM a.data_ricetta)::int = 2020);

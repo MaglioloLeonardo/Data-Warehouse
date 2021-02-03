@@ -1,0 +1,83 @@
+CREATE TABLE FarmaciaDT
+(
+  ID_farmacia INT NOT NULL,
+  PRIMARY KEY (ID_farmacia)
+);
+
+CREATE TABLE PazienteDT
+(
+  ID_paziente INT NOT NULL,
+  Codice_fiscale CHAR(16) NOT NULL,
+  Peso NUMERIC(4, 1) NOT NULL,
+  Altezza NUMERIC(3, 0) NOT NULL,
+  Anno_nascita NUMERIC(4, 0) NOT NULL,
+  Cap_residenza NUMERIC(5, 0) NOT NULL,
+  Cap_nascita NUMERIC(5, 0) NOT NULL,
+  Città_residenza VARCHAR(35) NOT NULL,
+  Città_nascita VARCHAR(35) NOT NULL,
+  PRIMARY KEY (ID_paziente)
+);
+
+CREATE TABLE MedicoDT
+(
+  ID_medico INT NOT NULL,
+  Codice_fiscale CHAR(16) NOT NULL,
+  Anno_nascita NUMERIC(4, 0) NOT NULL,
+  Cap_residenza NUMERIC(5, 0) NOT NULL,
+  Cap_nascita NUMERIC(5, 0) NOT NULL,
+  Città_residenza VARCHAR(35) NOT NULL,
+  Città_nascita VARCHAR(35) NOT NULL,
+  PRIMARY KEY (ID_medico)
+);
+
+CREATE TABLE FarmacoDT
+(
+  ID_farmaco INT NOT NULL,
+  Nome_farmaco VARCHAR(35) NOT NULL,
+  Produttore_farmaco VARCHAR(35) NOT NULL,
+  Generico boolean NOT NULL,
+  Somministrazione INT NOT NULL,
+  Nome_principio VARCHAR(40) NOT NULL,
+  Nome_famiglia VARCHAR(40) NOT NULL,
+  Prezzo_recente NUMERIC(6, 2) NOT NULL,
+  Prezzo_ticket NUMERIC(6, 2) NOT NULL,
+  PRIMARY KEY (ID_farmaco)
+);
+
+CREATE TABLE Specializzazione
+(
+  ID_specializzazione INT NOT NULL,
+  Specializzazione VARCHAR(30) NOT NULL,
+  PRIMARY KEY (ID_specializzazione)
+);
+
+CREATE TABLE Acquisto
+(
+  Esenzione boolean NOT NULL,
+  Numero_confezioni INT NOT NULL,
+  Dose_giornaliera FLOAT NOT NULL,
+  Durata_terapia INT NOT NULL,
+  Costo_paziente NUMERIC(6, 2) NOT NULL,
+  Costo_SSN NUMERIC(6, 2) NOT NULL,
+  Data_ricetta DATE NOT NULL,
+  Data_vendita DATE NOT NULL,
+  ID_farmacia INT NOT NULL,
+  ID_farmaco INT NOT NULL,
+  ID_paziente INT NOT NULL,
+  ID_medico INT NOT NULL,
+  PRIMARY KEY (Data_ricetta, Data_vendita, ID_farmacia, ID_farmaco, ID_paziente, ID_medico),
+  FOREIGN KEY (ID_farmacia) REFERENCES FarmaciaDT(ID_farmacia),
+  FOREIGN KEY (ID_farmaco) REFERENCES FarmacoDT(ID_farmaco),
+  FOREIGN KEY (ID_paziente) REFERENCES PazienteDT(ID_paziente),
+  FOREIGN KEY (ID_medico) REFERENCES MedicoDT(ID_medico)
+);
+
+CREATE TABLE MedicoSpecializzazione
+(
+  Peso_relazione NUMERIC(3,2) NOT NULL,
+  ID_medico INT NOT NULL,
+  ID_specializzazione INT NOT NULL,
+  PRIMARY KEY (ID_medico, ID_specializzazione),
+  FOREIGN KEY (ID_medico) REFERENCES MedicoDT(ID_medico),
+  FOREIGN KEY (ID_specializzazione) REFERENCES Specializzazione(ID_specializzazione)
+);

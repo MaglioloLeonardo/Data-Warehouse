@@ -1,0 +1,41 @@
+Dimensioni:
+
+Codice_fiscale_pazientex
+Codice_fiscale_medicox
+Nome_farmaco + Produttore_farmacox
+ID_farmaciax
+
+Data_ricettax
+Data_venditax
+________________________________________________
+
+Misure:
+
+Numero_confezioni
+Dose_giornaliera
+Durata_terapia
+Costo_paziente
+Costo_SSN
+Costo_totale
+__________________________________________________
+
+Attributi descrittivi:
+
+Esenzione
+
+Prezzo_recente
+Prezzo_ticket
+
+Peso
+Altezza
+Anno_nascita
+__________________________________________________
+
+Gerarchia condivise:
+	
+ paziente-medico
+ Data_ricetta - Data_vendita
+
+Arco multiplo: 
+	Specializzazione-medico
+
