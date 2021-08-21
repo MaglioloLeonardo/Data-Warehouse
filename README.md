@@ -1,5 +1,5 @@
 # DataWarehouse project
-ROLAP Datawarehouse implementata per offire supporto al funzionamento del Sistema Sanitario Nazionale.
+ROLAP Datawarehouse progettata per offire supporto al funzionamento del Sistema Sanitario Nazionale.
 
 La relazione comprende i seguenti schemi:
 - BPMN per la descrizione dei processi
